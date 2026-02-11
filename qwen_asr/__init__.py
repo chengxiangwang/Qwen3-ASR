@@ -16,6 +16,7 @@
 """
 qwen_asr: Qwen3-ASR package.
 """
+from transformers import AutoConfig, AutoModelForSpeechSeq2Seq
 
 from .inference.qwen3_asr import Qwen3ASRModel
 from .inference.qwen3_forced_aligner import Qwen3ForcedAligner
@@ -23,3 +24,17 @@ from .inference.qwen3_forced_aligner import Qwen3ForcedAligner
 from .inference.utils import parse_asr_output
 
 __all__ = ["__version__"]
+
+def register_qwen3_asr():
+    """注册 qwen3_asr 架构到 transformers 5.x"""
+    try:
+        from .core.transformers_backend.modeling_qwen3_asr import (
+            Qwen3ASRConfig,
+            Qwen3ASRForConditionalGeneration
+        )
+        AutoConfig.register("qwen3_asr", Qwen3ASRConfig)
+        AutoModelForSpeechSeq2Seq.register(Qwen3ASRConfig, Qwen3ASRForConditionalGeneration)
+    except Exception as e:
+        print(f"注册 qwen3_asr 失败: {e}")
+
+register_qwen3_asr()
